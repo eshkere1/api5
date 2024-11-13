@@ -39,7 +39,7 @@ def get_vacancies_by_languages_hh():
             }
             response = requests.get(url, params=payload)
             response.raise_for_status()
-            vacancies  = response.json()
+            vacancies = response.json()
             if page >= vacancies['pages']-1:
                 break
             for vacancy in vacancies["items"]:
@@ -47,7 +47,7 @@ def get_vacancies_by_languages_hh():
                 if salarys and salarys["currency"] == "RUR":
                     predicted_salary = predict_rub_salary(vacancy["salary"].get("from"), vacancy["salary"].get("to"))
                     if predicted_salary:
-                        all_salary.append(predict_rub_salary(vacancy["salary"].get("from"), vacancy["salary"].get("to")))
+                        all_salary.append(predicted_salary)
                         vacancies_processed += 1
         found_vacancy = response.json()["found"]
         if all_salary:
@@ -60,12 +60,11 @@ def get_vacancies_by_languages_hh():
     return vacancies_by_languages
 
 
-def predict_rub_salary_for_superJob(key):
+def predict_rub_salary_for_superJob(sj_key):
     vacancies_by_languages = {}
     languages = ["Python", "Java"]
     for language in languages:
-        all_salary = []
-        vacancies_processed = 0
+        all_salaries = []
         for page in count(0):
             headers = {
                 "X-Api-App-Id": sj_key,
@@ -77,19 +76,20 @@ def predict_rub_salary_for_superJob(key):
             }
             url = "	https://api.superjob.ru/2.0/vacancies/"
             response = requests.get(url, headers=headers, params=payload)
-            if not response.json()["objects"]:
+            vacancies = response.json()
+            response.raise_for_status()
+            if not vacancies["objects"]:
                 break
-            for vacancy in response.json()["objects"]:
+            for vacancy in vacancies["objects"]:
                 predicted_salary = predict_rub_salary(vacancy.get('payment_from'), vacancy.get('payment_to'))
                 if predicted_salary:
-                    all_salary.append(predicted_salary)
-                    vacancies_processed += 1
-            found_vacancy = response.json()["total"]
-            if all_salary:
-                average_salary = int(sum(all_salary)/len(all_salary))
+                    all_salaries.append(predicted_salary)
+            found_vacancy = vacancies["total"]
+            if all_salaries:
+                average_salary = int(sum(all_salaries)/len(all_salaries))
             vacancies_by_languages[language] = { 
                 "vacancies_found": found_vacancy,
-                "vacancies_processed": vacancies_processed,
+                "vacancies_processed": len(all_salaries),
                 "average_salary": average_salary
             }
     return vacancies_by_languages
