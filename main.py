@@ -87,11 +87,13 @@ def predict_rub_salary_for_superJob(sj_key):
             found_vacancy = vacancies["total"]
             if all_salaries:
                 average_salary = int(sum(all_salaries)/len(all_salaries))
-            vacancies_by_languages[language] = { 
-                "vacancies_found": found_vacancy,
-                "vacancies_processed": len(all_salaries),
-                "average_salary": average_salary
-            }
+            else:
+                average_salary = None              
+        vacancies_by_languages[language] = { 
+            "vacancies_found": found_vacancy,
+            "vacancies_processed": len(all_salaries),
+            "average_salary": average_salary
+        }
     return vacancies_by_languages
 
 
