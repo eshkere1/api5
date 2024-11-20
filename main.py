@@ -26,7 +26,7 @@ def get_vacancies_by_languages_hh():
     languages = ["Ruby", "Go"]
     for language in languages:
     
-        all_salary = []
+        all_salarys = []
         for page in count(0):
             url = "https://api.hh.ru/vacancies"
             payload = {
@@ -45,13 +45,13 @@ def get_vacancies_by_languages_hh():
                 if salarys and salarys["currency"] == "RUR":
                     predicted_salary = predict_rub_salary(vacancy["salary"].get("from"), vacancy["salary"].get("to"))
                     if predicted_salary:
-                        all_salary.append(predicted_salary)
+                        all_salarys.append(predicted_salary)
         found_vacancy = response.json()["found"]
-        if all_salary:
-            average_salary = int(sum(all_salary)/len(all_salary))
+        if all_salarys:
+            average_salary = int(sum(all_salarys)/len(all_salarys))
         vacancies_by_languages[language] = { 
             "vacancies_found": found_vacancy,
-            "vacancies_processed": len(all_salary),
+            "vacancies_processed": len(all_salarys),
             "average_salary": average_salary
         }
     return vacancies_by_languages
