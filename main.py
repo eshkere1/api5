@@ -49,6 +49,8 @@ def get_vacancies_by_languages_hh():
         found_vacancy = response.json()["found"]
         if all_salarys:
             average_salary = int(sum(all_salarys)/len(all_salarys))
+        else:
+            average_salary = None     
         vacancies_by_languages[language] = { 
             "vacancies_found": found_vacancy,
             "vacancies_processed": len(all_salarys),
